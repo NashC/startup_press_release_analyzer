@@ -2,24 +2,23 @@ PR Newswire Project Notes
 
 Next Steps:
 - +++DONE+++:Merge all smaller MongoDB collections into one master collection with all press releases
-- Strip from release text - check out https://regex101.com/ for testing
-    + +++DONE+++: strip website URL's
+- +++DONE+++: Strip URL's from release text - check out https://regex101.com/ for testing
 - +++DONE+++: Industries/Subjects - Add dummies to DF
 - +++DONE+++:Run topic clustering using these labels
-- +++DONE+++:sentiment analysis: spacy.io (https://spacy.io/), nltk.sentiment (http://www.nltk.org/) (http://www.nltk.org/api/nltk.sentiment.html#module-nltk.sentiment.sentiment_analyzer), TextBlob
-- +++DONE+++:Call w PR Newswire people to get more API calls per day and larger date range access
-- +++DONE+++:Make dictionaries out of Subjects and Industries
+- +++DONE+++:sentiment analysis: TextBlob
+- +++DONE+++: Call w PR Newswire people to get more API calls per day and larger date range access
+- +++DONE+++: Make dictionaries out of Subjects and Industries
 - +++DONE+++: Lemmatize words prior to tfidf or other model inputs
-- +++DONE+++: download press releases for organizations not classified as 'company'
+- +++DONE+++: download press releases for organizations classified as 'investor'
 - +++DONE+++: do value_counts() on 'source' of the releases to see top companies with releases
-- +++DONE+++: Check out Word2Vec: https://code.google.com/p/word2vec/
 - +++DONE+++: tfidf sparse matrix: normalize across rows so they sum to one
-
 - +++DONE+++: strip 'city, state' from beginning of each release and add to DF
-	+ add city, state, country, region
-- Do EDA/Plotting on meta data vs topic strength
+- +++DONE+++: add city, state, country, region columns
 - +++DONE+++: Manual grid search for optimal 'n_components' in NMF model
+
 - Calculate topic strength by meta item (industry, subject, location, other)
+- Do EDA/Plotting on meta data vs topic strength
+- Visualizations
 - Build web app
 	+ stack?
 		* Flask
@@ -56,14 +55,15 @@ GitHub repo with extensive ReadMe explaining entire project
 Code with extensive comments explaining each step
 
 
+
+
+
 Potential Sources for more press releases
 - Business Wire
 - Marketwired
 - Factiva
 - LexisNexus
 - Newsbank
-
-
 
 PR Newswire API Subject and Industry Codes
 

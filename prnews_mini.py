@@ -184,15 +184,15 @@ def print_top_words(model, feature_names, n_top_words):
 						for i in topic.argsort()[:-n_top_words - 1:-1]]))
 	pass
 
-new_stop_words = ['ha', "\'s", 'tt', 'ireach', "n\'t", 'wo', 'pv', 'tm', 'anite', 'rabichev', 'russell', '603', 'hana', 'jörgen', 'atmel', 'radwin', 'se', 'doxee', 'lantto', 'publ', 'fpc1025', '855', 'il', '0344']
+new_stop_words = ['ha', "\'s", 'tt', 'ireach', "n\'t", 'wo', 'pv', 'tm', 'anite', 'rabichev', 'russell', '603', 'hana', 'atmel', 'radwin', 'se', 'doxee', 'lantto', 'publ', 'fpc1025', '855', 'il', '0344']
 def make_stop_words(new_words_list):
 	tfidf_temp = TfidfVectorizer(stop_words='english')
 	stop_words = tfidf_temp.get_stop_words()
 	result = list(stop_words) + new_words_list
 	return result
 
-def row_normalize_tfidf(sparse_matrix):
-	return normalize(sparse_matrix, axis=1, norm='l1')
+def row_normalize_tfidf(np_matrix):
+	return normalize(np_matrix, axis=1, norm='l1')
 
 def get_topics(n_components=10, n_top_words=15, print_output=True, max_features=None):
 	custom_stop_words = make_stop_words(new_stop_words)
@@ -348,22 +348,9 @@ def grid_search_nmf_ncomponents(tfidf, folds, low, high, export_array):
 		if mse_temp < mse_min:
 			mse_min = mse_temp
 			mse_min_ncomponents = i
-
-		# cv = cross_val_score(nmf_temp, tfidf, scoring='mean_squared_error', cv=5)
-		# nmf_temp.fit(tfidf)
-		# W = nmf_temp.transform(tfidf)
-		# H = nmf_temp.components_
-		# tfidf_pred = np.dot(W, H)
-		# mse_temp = mean_squared_error(tfidf_dense, tfidf_pred)
-		# y_mse.append(mse_temp)
-		# x_range.append(i)
 		print 'MSE of n_components = %d: %.10f' %(i, mse_temp)
 		print '-------------------------------'
-		# if mse_temp < mse_min:
-		# 	mse_min = mse_temp
-		# 	mse_min_ncomponents = i
-	pass	
-	# return mse_min_ncomponents
+	pass
 
 def sum_dummie_counts(df):
 	for col in df.columns:
@@ -600,7 +587,7 @@ df = make_dummies(df, 'subject', 'subj')
 df = add_sentiment_to_df(df)
 release_texts = df['release_text']
 
-tfidf, nmf, W = get_topics(print_output=False)
+tfidf, nmf, W = get_topics(n_components=8, print_output=True)
 
 
 y_mse_tts1 = [(1, 9.0692358748435431e-08),
@@ -869,6 +856,8 @@ y_mse_tts13 = [(1, 5.9804414953768397e-06),
  (48, 4.8942133942614221e-06),
  (49, 4.8834745288657827e-06),
  (50, 4.8665892947397338e-06)]
+
+#y_mse_tts80: max_features=2500, test_size=0.2(folds=5)
 y_mse_tts80 = [(1, 5.9804949654718744e-06),
  (2, 5.8220599231756129e-06),
  (3, 5.7669352798572765e-06),
@@ -950,12 +939,84 @@ y_mse_tts80 = [(1, 5.9804949654718744e-06),
  (79, 4.5697077037386756e-06),
  (80, 4.5553279705869047e-06)]
 
-# grid_search_nmf_ncomponents(tfidf, 5, 25, 150, y_mse_tts20)
+#y_mse_tts100: max_features=2500, test_size=0.3333(folds=3)
+y_mse_tts100 = [(1, 5.9843051804150497e-06),
+ (2, 5.8380688221740067e-06),
+ (3, 5.7915998183721377e-06),
+ (4, 5.7585539168059717e-06),
+ (5, 5.7118665796715357e-06),
+ (6, 5.6832413240662698e-06),
+ (7, 5.6474357683182926e-06),
+ (8, 5.6172884967605943e-06),
+ (9, 5.5981858695781749e-06),
+ (10, 5.5683143425171122e-06),
+ (11, 5.5597532350042762e-06),
+ (12, 5.5297319639804819e-06),
+ (13, 5.5085389002884943e-06),
+ (14, 5.4913498731839419e-06),
+ (15, 5.473247836396042e-06),
+ (16, 5.4611105714301085e-06),
+ (17, 5.4469421933882837e-06),
+ (18, 5.4308552221872717e-06),
+ (19, 5.404576542467689e-06),
+ (20, 5.3848982668491524e-06),
+ (21, 5.3755439653405985e-06),
+ (22, 5.356330414414384e-06),
+ (23, 5.340241582297497e-06),
+ (24, 5.3337292731422635e-06),
+ (25, 5.3280196529913633e-06),
+ (26, 5.291773208642306e-06),
+ (27, 5.2885862334775284e-06),
+ (28, 5.2701359465267184e-06),
+ (29, 5.2577468426406804e-06),
+ (30, 5.2439210992543101e-06),
+ (31, 5.2354034105593494e-06),
+ (32, 5.2269113598520543e-06),
+ (33, 5.2197219262135475e-06),
+ (34, 5.2067022663543131e-06),
+ (35, 5.190200814297149e-06),
+ (36, 5.1898374463318984e-06),
+ (37, 5.1713527039154726e-06),
+ (38, 5.1557542806525737e-06),
+ (39, 5.1494044686128257e-06),
+ (40, 5.1312748177233788e-06),
+ (41, 5.120047357592568e-06),
+ (42, 5.1303596978192281e-06),
+ (43, 5.1039115254345073e-06),
+ (44, 5.101764740761389e-06),
+ (45, 5.0710281741183815e-06),
+ (46, 5.0785445542561074e-06),
+ (47, 5.065410973435611e-06),
+ (48, 5.0724009259608663e-06),
+ (49, 5.0374374634307759e-06),
+ (50, 5.038861067293328e-06)]
+
+
+# grid_search_nmf_ncomponents(tfidf, 3, 1, 50, y_mse_tts100)
 # grid_search_nmf_ncomponents(tfidf, 5, 1, 30, y_mse_tts11)
 # grid_search_nmf_ncomponents(tfidf, 5, 1, 40, y_mse_tts12)
 # grid_search_nmf_ncomponents(tfidf, 5, 1, 50, y_mse_tts13)
 # grid_search_nmf_ncomponents(tfidf, 5, 1, 50, y_mse_tts14)
 
-# for i in xrange(79):
-# 	diff = abs(y_mse_80[i+1][1] - y_mse_80[i][1])
-# 	per.append(diff / y_mse_80[i][1])
+def nmf_component_plot(mse_arr, show=False):
+	x = np.arange(1,len(mse_arr) + 1)
+	y = [j[1] for j in mse_arr]
+	y_percent = []
+	for i in xrange(len(mse_arr)-1):
+		diff = abs(mse_arr[i+1][1] - mse_arr[i][1])
+		y_percent.append(diff / mse_arr[i][1])
+	y_percent = [y_percent[0]] + y_percent
+	
+	f, axarr = plt.subplots(2, sharex=True, figsize=(12,12))
+	axarr[0].plot(x, y)
+	axarr[0].set_title('MSE vs NMF(n_components)')
+	axarr[1].scatter(x, y_percent)
+	if show:
+		plt.show()
+
+
+
+
+
+
+
