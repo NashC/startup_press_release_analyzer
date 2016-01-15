@@ -136,26 +136,28 @@ def country_from_state(state_name):
 def region_from_state(state_name):
 	regions = {
 		'EMEA': ['Tel Aviv', 'France', 'UAE', 'Spain', 'Germany', 'Sweden', 'UK', 'Finland', 'Ireland', 'Austria', 'Belgium', 'Russia'],
-		'Asia': ['India', 'Singapore'],
-		'West Coast': ['CA', 'NV', 'CO', 'OR', 'UT', 'WA', 'AZ', 'BC'],
-		'North East': ['ON', 'NY', 'MA', 'DC', 'PA', 'VA', 'MD', 'NJ', 'DE', 'NH', 'CT'],
-		'South': ['TX', 'GA', 'TN', 'SC', 'NC', 'FL', 'AL'],
-		'Midwest': ['NE', 'MO', 'MN', 'MI', 'WI', 'IL', 'IN', 'OH']
+		# 'Asia': ['India', 'Singapore'],
+		'West Coast (ex-CA)': ['NV', 'CO', 'OR', 'UT', 'WA', 'AZ', 'BC'],
+		'Northeast': ['ON', 'NY', 'MA', 'DC', 'PA', 'VA', 'MD', 'NJ', 'DE', 'NH', 'CT'],
+		'Midwest/South': ['NE', 'MO', 'MN', 'MI', 'WI', 'IL', 'IN', 'OH','TX', 'GA', 'TN', 'SC', 'NC', 'FL', 'AL']
 	}
 	for k,v in regions.iteritems():
+		# if state_name == 'CA':
+		# 	continue
 		if state_name in v:
 			return k
+
 	return 'none'
 
 def norcal_socal(city_name):
 	california = {
-		'NorCal': ['san francisco', 'san jose', 'sunnyvale', 'santa clara', 'mountain view', 'san mateo', 'palo alto', 'milpitas', 'fremont', 'campbell', 'redwood city', 'pleasanton', 'menlo park', 'south san'],
-		'SoCal': ['los angeles', 'san diego', 'irvine', 'long beach', 'newport beach', 'santa monica', 'santa barbara', 'fountain valley', 'beverly hills', 'aliso viejo', 'foster city', 'anaheim', 'el segundo', 'pasadena']
+		'Silicon Valley': ['san francisco', 'san jose', 'sunnyvale', 'santa clara', 'mountain view', 'san mateo', 'palo alto', 'milpitas', 'fremont', 'campbell', 'redwood city', 'pleasanton', 'menlo park', 'south san'],
+		'Southern CA': ['los angeles', 'san diego', 'irvine', 'long beach', 'newport beach', 'santa monica', 'santa barbara', 'fountain valley', 'beverly hills', 'aliso viejo', 'foster city', 'anaheim', 'el segundo', 'pasadena']
 	}
 	for k,v in california.iteritems():
 		if city_name in v:
 			return k
-	return 'none'
+	pass
 
 def lemmatize(doc_text):
 	# doc_text = doc_text.encode('utf-8')
@@ -167,12 +169,7 @@ def lemmatize(doc_text):
 	return result
 
 def prep_text(df):
-	df.drop_duplicates(subset=['article_id'], inplace=True)
-	df['city'] = df['release_text'].apply(lambda x: get_cities(x))
-	df['state'] = df['city'].apply(lambda x: state_from_city(x))
-	df['country'] = df['state'].apply(lambda x: country_from_state(x))
-	df['region'] = df['state'].apply(lambda x: region_from_state(x))
-	df['CA_region'] = df['city'].apply(lambda x: norcal_socal(x))
+
 	df['release_text'] = df['release_text'].apply(lambda x: re.sub(r'\(?(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)\)?', '', x, flags=re.M))
 	df['release_text'] = df['release_text'].apply(lambda x: lemmatize(x))
 	return df
@@ -209,93 +206,6 @@ def get_topics(n_components=10, n_top_words=15, print_output=True, max_features=
 		print_top_words(nmf, tfidf_feature_names, n_top_words)
 	return tfidf, nmf, W
 
-
-y_mse = [4.1586519190079731e-07,
- 4.0806056611869579e-07,
- 4.0635976762741562e-07,
- 4.0469315509174745e-07,
- 4.031626753591851e-07,
- 4.0198547133833227e-07,
- 4.0069371691965978e-07,
- 3.9989096055799519e-07,
- 3.9873993330429839e-07,
- 3.9755992608438446e-07,
- 3.9668909965925691e-07,
- 3.9565356967902645e-07,
- 3.9478109096903595e-07,
- 3.9395900472461631e-07,
- 3.9306251341616297e-07,
- 3.922508964184518e-07,
- 3.9139907529199026e-07,
- 3.9058720813092185e-07,
- 3.8985442673013608e-07,
- 3.8906441983276564e-07,
- 3.8829184088224553e-07,
- 3.8795241871128741e-07,
- 3.8670916159757251e-07,
- 3.8630316709902775e-07,
- 3.8551159536125117e-07,
- 3.8529296023215857e-07,
- 3.8405309135809741e-07,
- 3.8349524545279573e-07,
- 3.8312979033889216e-07,
- 3.8214679236464401e-07,
- 3.8163433071433644e-07,
- 3.812476213782855e-07,
- 3.8037440645891213e-07,
- 3.8003752994030476e-07,
- 3.7912925338958192e-07,
- 3.7869750967188198e-07,
- 3.7801548354496874e-07,
- 3.7721730759096696e-07,
- 3.7667911984978913e-07,
- 3.76411057692006e-07,
- 3.7596695262405878e-07,
- 3.7503280027874852e-07,
- 3.74409880730487e-07,
- 3.7385335317775083e-07,
- 3.7370292291722861e-07,
- 3.7324109586296963e-07,
- 3.7239348121954796e-07,
- 3.7220875451942766e-07,
- 3.7157594400522471e-07,
- 3.7092184827551988e-07]
-x_range = np.arange(1,51)
-y_mse_tts_round1 = [(1, 8.9955943708407939e-08),
- (2, 9.3778027752158838e-08),
- (3, 9.3544419976425533e-08),
- (4, 9.5515890208877072e-08), 
- (5, 9.6656460099495444e-08),
- (6, 9.5885980397053374e-08),
- (7, 9.5334438048771455e-08),
- (8, 9.7381168085049762e-08),
- (9, 9.7914818624726174e-08),
- (10, 9.8099492350250766e-08),
- (11, 9.785952599794063e-08),
- (12, 9.8796338877999243e-08),
- (13, 9.8042812898758145e-08),
- (14, 1.0014030681676387e-07),
- (15, 1.0061291988251698e-07),
- (16, 1.0121614033949377e-07),
- (17, 1.0100411437616885e-07)]
-
-y_mse_tts_round2 = [(1, 8.9668696816688193e-08),
- (2, 9.354006756512067e-08),
- (3, 9.3912747795884238e-08),
- (4, 9.4640311785966076e-08),
- (5, 9.573811538314732e-08),
- (6, 9.6150569668228365e-08),
- (7, 9.6823212282909846e-08),
- (8, 9.7862620557820369e-08),
- (9, 9.7807808154723832e-08),
- (10, 9.9052272941647242e-08),
- (11, 9.7887749103781175e-08),
- (12, 9.9018721619947148e-08),
- (13, 1.0006480530688792e-07),
- (14, 1.0013447027686969e-07),
- (15, 1.0061047370872081e-07),
- (16, 1.0133475093254728e-07),
- (17, 1.0221336559036943e-07)]
 
 def tfidf_traintestsplit(tfidf_sparse, test_size=0.2):
 	# A = tfidf_sparse.toarray()
@@ -365,7 +275,14 @@ def textblob_sentiment(text):
 	subjectivity = blob.sentiment.subjectivity
 	return (polarity, subjectivity)
 
-def add_sentiment_to_df(df):
+def feature_engineering(df):
+	df.drop_duplicates(subset=['article_id'], inplace=True)
+	df['city'] = df['release_text'].apply(lambda x: get_cities(x))
+	df['state'] = df['city'].apply(lambda x: state_from_city(x))
+	df['region'] = df['state'].apply(lambda x: region_from_state(x))
+	df['region'] = df.apply(lambda x: norcal_socal(x['city']) if x['state'] == 'CA' else x['region'], axis=1)
+	df['country'] = df['state'].apply(lambda x: country_from_state(x))
+	df['CA_region'] = df['city'].apply(lambda x: norcal_socal(x))
 	df['polarity'] = df['release_text'].apply(lambda x: textblob_sentiment(x)[0])
 	df['subjectivity'] = df['release_text'].apply(lambda x: textblob_sentiment(x)[1])
 	return df
@@ -582,14 +499,99 @@ df_orig = mongo_to_df('press', 'test_master_1')
 # industry_dict = make_industry_dict()
 
 df = prep_text(df_orig)
+df = feature_engineering(df)
 df = make_dummies(df, 'industry', 'ind')
 df = make_dummies(df, 'subject', 'subj')
-df = add_sentiment_to_df(df)
+
 release_texts = df['release_text']
 
 tfidf, nmf, W = get_topics(n_components=8, print_output=True)
 
-
+y_mse = [4.1586519190079731e-07,
+ 4.0806056611869579e-07,
+ 4.0635976762741562e-07,
+ 4.0469315509174745e-07,
+ 4.031626753591851e-07,
+ 4.0198547133833227e-07,
+ 4.0069371691965978e-07,
+ 3.9989096055799519e-07,
+ 3.9873993330429839e-07,
+ 3.9755992608438446e-07,
+ 3.9668909965925691e-07,
+ 3.9565356967902645e-07,
+ 3.9478109096903595e-07,
+ 3.9395900472461631e-07,
+ 3.9306251341616297e-07,
+ 3.922508964184518e-07,
+ 3.9139907529199026e-07,
+ 3.9058720813092185e-07,
+ 3.8985442673013608e-07,
+ 3.8906441983276564e-07,
+ 3.8829184088224553e-07,
+ 3.8795241871128741e-07,
+ 3.8670916159757251e-07,
+ 3.8630316709902775e-07,
+ 3.8551159536125117e-07,
+ 3.8529296023215857e-07,
+ 3.8405309135809741e-07,
+ 3.8349524545279573e-07,
+ 3.8312979033889216e-07,
+ 3.8214679236464401e-07,
+ 3.8163433071433644e-07,
+ 3.812476213782855e-07,
+ 3.8037440645891213e-07,
+ 3.8003752994030476e-07,
+ 3.7912925338958192e-07,
+ 3.7869750967188198e-07,
+ 3.7801548354496874e-07,
+ 3.7721730759096696e-07,
+ 3.7667911984978913e-07,
+ 3.76411057692006e-07,
+ 3.7596695262405878e-07,
+ 3.7503280027874852e-07,
+ 3.74409880730487e-07,
+ 3.7385335317775083e-07,
+ 3.7370292291722861e-07,
+ 3.7324109586296963e-07,
+ 3.7239348121954796e-07,
+ 3.7220875451942766e-07,
+ 3.7157594400522471e-07,
+ 3.7092184827551988e-07]
+x_range = np.arange(1,51)
+y_mse_tts_round1 = [(1, 8.9955943708407939e-08),
+ (2, 9.3778027752158838e-08),
+ (3, 9.3544419976425533e-08),
+ (4, 9.5515890208877072e-08), 
+ (5, 9.6656460099495444e-08),
+ (6, 9.5885980397053374e-08),
+ (7, 9.5334438048771455e-08),
+ (8, 9.7381168085049762e-08),
+ (9, 9.7914818624726174e-08),
+ (10, 9.8099492350250766e-08),
+ (11, 9.785952599794063e-08),
+ (12, 9.8796338877999243e-08),
+ (13, 9.8042812898758145e-08),
+ (14, 1.0014030681676387e-07),
+ (15, 1.0061291988251698e-07),
+ (16, 1.0121614033949377e-07),
+ (17, 1.0100411437616885e-07)]
+y_mse_tts_round2 = [(1, 8.9668696816688193e-08),
+ (2, 9.354006756512067e-08),
+ (3, 9.3912747795884238e-08),
+ (4, 9.4640311785966076e-08),
+ (5, 9.573811538314732e-08),
+ (6, 9.6150569668228365e-08),
+ (7, 9.6823212282909846e-08),
+ (8, 9.7862620557820369e-08),
+ (9, 9.7807808154723832e-08),
+ (10, 9.9052272941647242e-08),
+ (11, 9.7887749103781175e-08),
+ (12, 9.9018721619947148e-08),
+ (13, 1.0006480530688792e-07),
+ (14, 1.0013447027686969e-07),
+ (15, 1.0061047370872081e-07),
+ (16, 1.0133475093254728e-07),
+ (17, 1.0221336559036943e-07)]
 y_mse_tts1 = [(1, 9.0692358748435431e-08),
  (2, 9.3354952077386322e-08),
  (3, 9.3031976312425973e-08),
