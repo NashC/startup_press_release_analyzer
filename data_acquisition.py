@@ -323,7 +323,7 @@ def main(start_index):
 		- None: function writes to MongoDB database and returns nothing
 	'''
 	#create orgs df
-	orgs_csv_file = '../crunchbase/cb_odm_csv/organizations.csv'
+	orgs_csv_file = 'data/organizations.csv'
 	df_orgs = make_orgs_df(orgs_csv_file)
 	print 'DataFrame successfully created'
 	
