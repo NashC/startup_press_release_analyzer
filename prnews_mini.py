@@ -168,8 +168,7 @@ def lemmatize(doc_text):
 	result = ' '.join(temp)
 	return result
 
-def prep_text(df):
-
+def prep_release_text(df):
 	df['release_text'] = df['release_text'].apply(lambda x: re.sub(r'\(?(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)\)?', '', x, flags=re.M))
 	df['release_text'] = df['release_text'].apply(lambda x: lemmatize(x))
 	return df
@@ -494,15 +493,13 @@ def make_industry_dict():
 	ind_dict = {x[0]:x[1] for x in ind_list}
 	return ind_dict
 
-df_orig = mongo_to_df('press', 'test_master_1')
 # subject_dict = make_subject_dict()
 # industry_dict = make_industry_dict()
-
-df = prep_text(df_orig)
+df_orig = mongo_to_df('press', 'test_master_1')
+df = prep_release_text(df_orig)
 df = feature_engineering(df)
 df = make_dummies(df, 'industry', 'ind')
 df = make_dummies(df, 'subject', 'subj')
-
 release_texts = df['release_text']
 
 tfidf, nmf, W = get_topics(n_components=8, print_output=True)
