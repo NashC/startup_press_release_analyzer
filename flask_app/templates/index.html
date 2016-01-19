@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- <div id='textform'>
+	<br>
+	<h4>Type or paste your press release below:</h4>
+
+	<textarea name="text" form="usrform" rows="20" cols="60"></textarea>
+
+	<form role="form" method='POST' action="/analyzer" id="usrform">
+	  <input type="submit" class="btn btn-default">
+	</form>
+</div>
+
+
+<div id='stats'>
+<h2>Press Release Stats</h2>
+
+{{graph_html}}
+</div> -->
+
+<div class="container-fluid" style="padding-top: 10px;">
+    <div class="row">
+	    <div class="col-lg-5" id='textform'>
+			<h4>Type or paste your press release below:</h4>
+
+			<form role="form" method='POST' action="/analyzer" id="usrform">
+			  <textarea class="form-control" name="text" form="usrform" rows="20"></textarea>
+			  <input type="submit" class="btn btn-default form-control" style="padding-top: 2px;">
+			</form>
+	    </div>
+
+		<div class="col-lg-7" id='stats' style="padding-top: 10px;">
+			<h3 align="center">Press Release Analysis</h3>
+			<pre><b>Word Count:</b> {{num_words}}     <b>Sentence Count:</b> {{num_sentences}}</pre>
+			{{graph_html}}
+		</div>
+		<br>
+    </div>
+</div>
+
+{% endblock %}
