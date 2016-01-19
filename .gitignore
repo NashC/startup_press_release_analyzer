@@ -3,3 +3,6 @@
 *.ipynb_checkpoints
 
 /data/organizations.csv
+/presentation/*
+/old_files/*
+spa_project_notes.md
