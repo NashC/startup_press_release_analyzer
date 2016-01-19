@@ -9,6 +9,7 @@ from pprint import pprint
 import pymongo
 from pymongo import MongoClient
 
+
 def get_master_data():
 	'''
 		Function used to acquire different PR Newswire API parameter values.
