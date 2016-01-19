@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+<br>
+<h3>Press Releases:</h3>
+{% for post in posts %}
+	<strong>Source:</strong> {{ post.source }} <br>
+	<strong>Headline:</strong> {{ post.headline }} <br>
+	<strong>Press Release Text:</strong> {{ post.release_text }} <br>
+<br>
+{% endfor %}
+
+{% endblock %}
