@@ -2,6 +2,7 @@
 *.pyc
 *.ipynb_checkpoints
 
+visualizations.ipynb
 data/organizations.csv
 presentation/*
 old_files/*
