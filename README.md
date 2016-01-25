@@ -5,7 +5,7 @@
 Performed NLP text analysis on large corpus of startup press releases.
 
 
-**TL;DR Process:**  
+**Process:**  
 List of startup companies from [Crunchbase.com](www.crunchbase.com).  
 Downloaded corpus of Press Releases using [PR Newswire](http://www.prnewswire.com/) API and store in MongoDB.  
 Data Cleaning and Feature Engineering  
@@ -83,4 +83,4 @@ Puts each press release through TF-IDF and NMF to produce latent topics.
 - Lastly, I wrote a program to print the top words from each latent topic so a human could read them and make their own analysis.
 
 ##How to run the program
-In order to run the entire program, you would have to have access to the Crunchbase list of companies csv file and the MongoDB database containing the press releases; both of which are too large for my Github repo. However, if you did have both those files, you would simply open up a terminal and call 'python model.py'. The entire program would run and return to you the top 15 words from the top eight latent topics from my NMF model.
+In order to run the entire program, you would have to have access to the Crunchbase list of companies csv file and the MongoDB database containing the press releases; both of which are too large for this Github repo. However, if you did have both those files, you would simply open up a terminal and call 'python model.py'. The entire program would run and return to you the top 15 words from the top eight latent topics from my NMF model.
