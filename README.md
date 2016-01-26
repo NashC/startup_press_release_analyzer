@@ -2,7 +2,7 @@
 
 ##Project Overview
 **Project Summary:**  
-Performed NLP text analysis on large corpus of startup press releases.
+Performed NLP text analysis on large corpus of Startup press releases. Used TF-IDF and NMF to find latent topics. Explored how latent topics vary by industry and location.
 
 
 **Process:**  
