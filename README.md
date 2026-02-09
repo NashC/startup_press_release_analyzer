@@ -1,86 +1,40 @@
-# Startup Press Release Analyzer  
+# Startup Press Release Analyzer
 
-##Project Overview
-**Project Summary:**  
-Performed NLP text analysis on large corpus of Startup press releases. Used TF-IDF and NMF to find latent topics. Explored how latent topics vary by industry and location.
+NLP analysis of 6,500+ startup press releases to discover latent topics using unsupervised learning. Built as a capstone project for the Galvanize Data Science Immersive program.
 
+## Approach
 
-**Process:**  
-List of startup companies from [Crunchbase.com](www.crunchbase.com).  
-Downloaded corpus of Press Releases using [PR Newswire](http://www.prnewswire.com/) API and store in MongoDB.  
-Data Cleaning and Feature Engineering  
-NMF Models: TF-IDF, NMF => Get Latent Topics among Press Releases  
-Results: Found several startup type buzzwords as topics (i.e. Software, Biotech, Mobile, Apps, etc).
+1. Scraped press releases from PR Newswire's API using a Crunchbase company list as seed data, stored in MongoDB
+2. Cleaned and featurized text (lemmatization, sentiment analysis via TextBlob, city/state/region extraction)
+3. Transformed corpus with TF-IDF, then factored the term-document matrix with Non-negative Matrix Factorization (NMF) to extract latent topics
 
-##Detailed Process
-###NLP Algorithms Used
-**[TF-IDF: Term Frequency - Inverse Document Frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)**  
-After cleaning the data I fed every press release text through a TF-IDF model. This turns every document into a numerical vector representing how important each word is to the document. The word strength increases by the number of times the word appears in the text (term frequency), but is offset by the frequency of the word (inverse document frequency) as rarely used terms can often be more important than common ones.
+## Model Validation
 
-**[NMF: Non-Negative Matrix Factorization](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization)**  
-I took the output matrix of the TF-IDF model and fed it into an NMF model. The NMF algorithm factors the input matrix into two separate matrices, W & H. The H matrix represents the entire vocabulary of your corpus, while the W matrix represents the strength of each vocab word across a number of latent features. I then got the top words for each latent feature, to figure out the most represented topics in my corpus.  
+NMF doesn't have a standard accuracy metric or a straightforward way to do cross-validation — you can't remove 20% of rows from the TF-IDF matrix without breaking the factorization. Following published approaches for NMF grid search, I instead zeroed out a random 20% of matrix entries per fold, reconstructed the approximate matrix from W and H, and measured MSE against the original. Five-fold cross-validation showed diminishing returns beyond 3 components (~0.1-0.5% MSE improvement per additional component), but 3 topics were too coarse for human interpretation. After reviewing the top-15 words at several settings, 8 topics gave the best separation.
 
-###Model Validation
-Unlike a regression model, there is no accuracy or other metric to use to validate your findings. You also can't use algorithms like [Scikit Learn's Grid Search](http://scikit-learn.org/stable/modules/grid_search.html) to find the optimal inputs for each of the TF-IDF and NMF model parameters. 
+External validation: the 8 discovered topics correlated well with PR Newswire's own industry classifications, which the model never saw.
 
-The one parameter that I was especially interested in optimizing was the number of latent features for my NMF model. This determines the number of columns for the W matrix when the model performs the factorization. The most difficult part is doing a proper train test split on the TF-IDF output matrix for your cross validation. For a five fold cross validation, you would typically hold out 20% of the observations. If you do that for on the input to the NMF model, it can't factor the matrix properly that will give you any useful results.
+## Results
 
-Therefore, after reading a couple scientific papers on grid search's for NMF models, I found that instead of removing 20% of the rows, you could set a random 20% of the entries to zero. Then find the Mean Squared Error (MSE) between the approximate original matrix formed by multiplying the W and H sub-matrices, and the actual input matrix. You then do this five times for an equivalent five fold cross validation, take the average of the MSE's for those five runs, and that's your overall MSE for that parameter setting.
+Eight latent topics with clear thematic separation:
 
-I built several functions to perform this cross validation. I found after having greater than three components, the MSE only improved by an average of 0.1 - 0.5% for each additional component. However, if I only choose three components, that would mean I would only have three major topics for my documents. This is where I had to make a decision between mathematical optimization and human interpretability. After reviewing the top 15 words for each topic on several different settings, I decided having eight latent topics was the best choice for a human reader.
+| Topic | Theme | Top words |
+|-------|-------|-----------|
+| 1 | Insurance | insurance, quote, car, auto, coverage, driver, online |
+| 2 | Enterprise SaaS | data, cloud, service, solution, software, enterprise, platform |
+| 3 | Healthcare | health, patient, care, medical, hospital, clinical, cancer |
+| 4 | Digital Media | content, video, social, game, digital, marketing, medium |
+| 5 | Clean Energy | solar, energy, power, renewable, module, utility, battery |
+| 6 | Hardware/Printing | epson, printer, label, print, 3d, projector, ink |
+| 7 | Mobile Apps | app, mobile, user, device, android, apps, iphone |
+| 8 | SEC Filings | statement, forward, risk, securities, future, differ, exchange |
 
-I also got an additional form of soft model validation. When downloading the press releases from PR Newswire, each document comes with attached industry classifications. After choosing my eight latent topics, I found they correlated very well with the industry classifications provided from that outside source.
+## Code
 
-###Results
-Here are the top 15 words from each of my eight latent topics. As you can see, they all have pretty clear separation of topics and contain several "startup" type words and themes.  
-**Topic #1:**  
-insurance quote car auto coverage driver online comparing website agency client plan policy multiple carrier  
-**Topic #2:**  
-data cloud service solution customer business software enterprise management network security technology platform application provider  
-**Topic #3:**  
-health patient care healthcare medical hospital clinical cancer physician elsevier treatment research disease drug program  
-**Topic #4:**  
-content video student social game digital marketing medium online brand learning company school new platform  
-**Topic #5:**  
-solar energy power project renewable module utility sunpower electricity skypower battery smart technology electric home  
-**Topic #6:**  
-epson printer label print printing pos color america projector ink 3d trademark ricoh seiko registered  
-**Topic #7:**  
-app mobile user device new android apps store iphone windows available feature apple vehicle phone  
-**Topic #8:**  
-statement looking forward risk company result uncertainty securities release future factor actual materially differ exchange
+- `data_acquisition.py` — PR Newswire API scraping with rate limit handling, batch processing, HTML→text extraction via BeautifulSoup, MongoDB storage
+- `data_munging.py` — Text cleaning, feature engineering (industry dummies, geographic extraction, lemmatization, sentiment)
+- `model.py` — TF-IDF vectorization, NMF factorization, topic extraction. Run with `python model.py`
 
-##Detailed Code Walk Through
-Below will be a brief description of each file of my code. I'll go over the big chunks of what's going on in each file, so you could follow along if you're interested in reading the code in more depth.
+## Tech Stack
 
-###data_acquisition.py
-This file handles taking the list of crunchbase companies, querying the PR Newswire API and storing the results in the local MongoDB database.  
-- Import list of Crunchbase organizations from CSV file into Pandas DataFrame  
-- Import only organziations that classify themselves as a 'company' or 'investor'  
-- Create MongoDB connection with proper database and collection name  
-- Prep the request parameters for the PR Newswire API as specified in their documentation
-- After trial and error, I found the API could only handle about 50 company names for each request, so I built a function to separate the company names into sets of 50 and prep each API request with this in mind.  
-- Each press release came as an HTML doc. I used [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/) to extract the text from the HTML.  
-- I assembled each API response into a dictionary and then inserted it into MongoDB.  
-- I also had an API call limit of 5000 requests per day, so I created status print statements to note the last batch of company names successfully downloaded, so I could start at the next batch for tomorrow.  
-- At the end I had over 6500 unique press releases.
-
-###data_munging.py  
-This file takes the press releases from MongoDB, cleans the data and adds some new features, making it ready for TF-IDF model input.
-- Import MongoDB collection into a Pandas DataFrame for easier manipulation in Python.  
-- Take all the industry and subject classifications and make dummy columns for later use.
-- The city source name of each release is in the text of each document at the beginning. I make a function to extract these city names from the text and store them in another column.  
-- There were too many cities to do any useful analysis, so I built some dictionaries to add the state, country and regions based on each city name.  
-- I used [TextBlob](https://textblob.readthedocs.org/en/dev/) to lemmatize and perform sentiment analysis on each document.
-- The DataFrame was now ready to be put into the TF-IDF model.
-
-###model.py  
-Puts each press release through TF-IDF and NMF to produce latent topics.
-- Import press releases from MongoDB into a Pandas DataFrame.  
-- Call main function from data_munging.py to clean and prep the data.
-- Input press release text into [Scikit Learn's TF-IDF Vectorizer Model](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) to output the sparse matrix.  
-- Take the TF-IDF output and put it into [Sci-kit Learn's NMF model](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.NMF.html) to get the W and H factorization matrices based on the number of latent topics I specified.  
-- Lastly, I wrote a program to print the top words from each latent topic so a human could read them and make their own analysis.
-
-##How to run the program
-In order to run the entire program, you would have to have access to the Crunchbase list of companies csv file and the MongoDB database containing the press releases; both of which are too large for this Github repo. However, if you did have both those files, you would simply open up a terminal and call 'python model.py'. The entire program would run and return to you the top 15 words from the top eight latent topics from my NMF model.
+Python, scikit-learn (TF-IDF, NMF), MongoDB, pandas, TextBlob, BeautifulSoup, Flask (demo app)
