@@ -1,5 +1,6 @@
 #app.py
 
+import os
 # import the Flask class from the flask module
 from flask import Flask, render_template, redirect, url_for, request, session, flash, g, Markup
 from pymongo import MongoClient
@@ -9,7 +10,7 @@ import numpy as np
 import plotly.graph_objs as go
 from plotly import tools
 import plotly.tools as tls
-py.sign_in('nashc', 'REDACTED_API_KEY')
+py.sign_in(os.environ.get('PLOTLY_USERNAME', ''), os.environ.get('PLOTLY_API_KEY', ''))
 
 
 # create the application object
